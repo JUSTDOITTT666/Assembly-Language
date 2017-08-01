@@ -125,3 +125,59 @@ sp = 00FC; 修改的内存单元的地址是220FC, 内容为2F37
 ```
 2.
 >不明白
+
+### 实验4
+1
+
+ 
+> 修改段地址，使偏移地址从0开始
+```
+assume cs:code
+
+code segment
+
+    mov ax,0020h
+    mov ds,ax
+    
+    mov bx,0
+    
+    mov cx,64
+    
+s:  mov [bx],bx
+    inc bx
+    loop s
+    
+    mov ax,4c00h
+    int 21h
+
+code ends
+
+end
+
+```
+
+3
+> 第一空指明数据从cs开始复制，第二空假定为1，然后生成.exe文件，使用u来观察代码的存储情况 观察到:
+```
+2B29:0017 B8004c MOV AX,4C00
+```
+可以得出复制偏移地址从0-16,所以cx为17
+```
+assume cs:code
+code segment
+
+    mov ax,cs
+    mov ds,ax
+    mov ax,0020h
+    mov es,ax
+    mov bx,0
+    mov cx,17h
+s:  mov al,[bx]
+    mov es:[bx],al
+    inc bx
+    loop s
+    mov ax,4c00h
+    int 21h
+code ends
+end
+```
