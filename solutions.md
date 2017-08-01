@@ -181,3 +181,62 @@ s:  mov al,[bx]
 code ends
 end
 ```
+
+### 检测点6.1
+1. 
+```
+assume cs:codesg
+
+codesg segment
+    dw 0123h,0456h,0789h,0abch,0defh,0fedh,0cbah,0987h
+    
+start: mov ax,0
+       mov ds,ax
+       mov bx,0
+       
+       mov cx,8
+    s: mov ax,[bx]
+       mov cs:[bx],ax
+       add bx,2
+       loop s
+       
+       mov ax,4c00h
+       int 21h
+
+codesg ends
+
+end start
+
+```
+
+2. 
+```
+assume cs:codesg
+
+codesg segment
+    dw 0123h,0456h,0789h,0abch,0defh,0fedh,0cbah,0987h
+    dw 0,0,0,0,0,0,0,0,0,0
+    
+start: mov ax,cs
+       mov ss,ax
+       mov sp,24h   ;代码前面有18个字,36个字节
+        
+       mov ax,0
+       mov ds,ax
+       mov bx,0
+       
+       mov cs,8
+    s: push [bx]
+       pop ss:[bx]
+       add bx,2
+       loop s
+       
+       mov ax,4c00h
+       int 21h
+
+codesg ends
+
+end start
+    
+```
+
