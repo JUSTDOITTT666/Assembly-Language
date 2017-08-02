@@ -240,3 +240,97 @@ end start
     
 ```
 
+### 实验5
+1
+> （1） 数据保持不变
+（2） cs=2B2Bh, ss=2B29h, ds= 2B19h
+（3） X-2，X-1(cs=2B2Bh, ds=2B19h, ss=2B2Ah)
+
+2
+> 与上题数据保持一致
+（4） (N/16+1)*16 // 段是以16字节对齐的
+
+3
+>（1）数据保持不变
+（2） cs=2B29h, ss=2B29h, ds=2B19h
+（3） X+3, X+4(cs=2B29 ss=2B2D ds=2B2C)
+
+4
+>只有程序3可以正确运行，在不指明程序入口的情况下，程序默认按照顺序从头开始执行，而3个程序中只有程序3的code段位于最开始的部分，所以只有程序3可以正确运行。
+
+5
+```
+assume cs:code
+a segment
+    db 1,2,3,4,5,6,7,8
+a ends
+
+b segment
+    db 1,2,3,4,5,6,7,8
+b ends
+
+c segment
+    db 0,0,0,0,0,0,0,0
+c ends
+
+code segment
+start:
+    mov ax,a
+    mov ds,ax
+
+    mov ax,b
+    mov ss,ax
+
+    mov ax,c
+    mov es,ax
+
+    mov bx,0
+    mov cx,8
+s:
+    mov al,ds:[bx]   ;使用三个段寄存器来处理三段数据
+    add al,ss:[bx]
+    mov es:[bx],al
+    inc bx
+    loop s
+
+    mov ax,4c00h
+    int 21h
+
+code ends
+end start
+```
+
+6
+```
+assume cs:code
+a segment
+    dw 1,2,3,4,5,6,7,8,9,0ah,0bh,0ch,0dh,0eh,0fh,0ffh
+a ends
+
+b segment
+    dw 0,0,0,0,0,0,0,0
+b ends
+
+code segment
+start:
+    mov ax,a
+    mov ds,ax
+
+    mov ax,b
+    mov ss,ax
+    mov sp,10h
+
+    mov bx,0
+    mov cx,8
+s:
+    push ds:[bx]  ;栈是从底部开始填数字的
+    add bx,2
+    loop s
+
+    mov ax,4c00h
+    int 21h
+
+code ends
+end start
+```
+
